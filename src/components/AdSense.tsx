@@ -33,7 +33,7 @@ export const AdSense: React.FC<AdSenseProps> = ({
       <ins
         className="adsbygoogle"
         style={style}
-        data-ad-client="ca-pub-XXXXXXXXXXXXXXXX" // 본인의 클라이언트 ID로 교체 필요
+        data-ad-client="ca-pub-6426723216092180" // 본인의 클라이언트 ID로 교체 필요
         data-ad-slot={slot}
         data-ad-format={format}
         data-full-width-responsive={responsive}
