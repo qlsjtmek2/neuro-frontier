@@ -65,10 +65,10 @@ const App: React.FC = () => {
           <div className="text-center space-y-8 p-10 bg-secondary rounded-3xl shadow-2xl border border-white/10 flex-1 w-full">
             <div className="space-y-2">
               <h1 className="text-5xl font-black tracking-tighter">
-                <span className="text-primary">NEURO</span> <br />
+                <span className="text-blue-500">NEURO</span> <br />
                 <span className="text-white">FRONTIER</span>
               </h1>
-              <div className="h-1.5 w-24 bg-primary mx-auto rounded-full shadow-[0_0_15px_rgba(59,130,246,0.5)]" />
+              <div className="h-1.5 w-24 bg-blue-500 mx-auto rounded-full shadow-[0_0_15px_rgba(59,130,246,0.5)]" />
             </div>
             
             {/* Best Score Badge */}

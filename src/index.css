@@ -1,5 +1,14 @@
 @import "tailwindcss";
 
+@theme {
+  --color-primary: #3b82f6;
+  --color-background: #0f172a;
+  --color-secondary: #1e293b;
+  --color-accent: #f59e0b;
+  --color-success: #10b981;
+  --color-error: #ef4444;
+}
+
 :root {
   background-color: #0f172a;
   color: #f8fafc;
@@ -11,7 +20,6 @@ body {
   min-height: 100vh;
   user-select: none;
   background-color: #0f172a;
-  /* 기본적으로 스크롤 허용, 게임판에서만 고정 */
   overflow-x: hidden;
   overflow-y: auto;
 }
@@ -28,7 +36,6 @@ canvas {
   touch-action: none;
 }
 
-/* 커스텀 스크롤바 (다크모드용) */
 .custom-scrollbar::-webkit-scrollbar {
   width: 6px;
 }
