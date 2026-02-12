@@ -46,7 +46,7 @@ const CountdownOverlay: React.FC<{ onComplete: () => void }> = ({ onComplete }) 
 
 const getPerformanceRank = (rt: number) => {
   const p = getResponseTimePercentile(rt);
-  if (p <= 5) return { label: '신경계 마스터', color: 'text-primary', percentile: `상위 ${p}%` };
+  if (p <= 5) return { label: '탈 인간급', color: 'text-primary', percentile: `상위 ${p}%` };
   if (p <= 15) return { label: '프로 운동선수', color: 'text-success', percentile: `상위 ${p}%` };
   if (p <= 35) return { label: '우수한 집중력', color: 'text-accent', percentile: `상위 ${p}%` };
   if (p <= 65) return { label: '평균 수준', color: 'text-white', percentile: `상위 ${p}%` };
