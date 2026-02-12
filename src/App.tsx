@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useGameStore } from './store/useGameStore';
 import { GameBoard } from './components/GameBoard';
+import { AdSense } from './components/AdSense';
 
 // Normal CDF approximation (Abramowitz & Stegun)
 function normalCDF(x: number): number {
@@ -123,6 +124,9 @@ const App: React.FC = () => {
                 트레이닝 시작
                 <span className="block text-xs font-bold text-blue-100 mt-1 opacity-70 group-hover:opacity-100 uppercase tracking-[0.2em]">Start Training</span>
               </button>
+
+              {/* Main Menu Bottom Ad */}
+              <AdSense slot="1234567890" />
             </div>
           </div>
 
@@ -247,6 +251,9 @@ const App: React.FC = () => {
               메인으로
             </button>
           </div>
+
+          {/* Result Screen Bottom Ad */}
+          <AdSense slot="0987654321" />
         </div>
       )}
     </div>
