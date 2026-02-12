@@ -58,9 +58,9 @@ const App: React.FC = () => {
   if (!isHydrated) return <div className="min-h-screen bg-background" />;
 
   return (
-    <div className="min-h-screen bg-background text-foreground flex flex-col items-center justify-center font-sans">
+    <div className="min-h-screen bg-background text-foreground flex flex-col items-center py-10 md:justify-center font-sans overflow-y-auto">
       {status === 'IDLE' && (
-        <div className="flex flex-col md:flex-row gap-8 items-stretch max-w-6xl w-full p-6 animate-in fade-in slide-in-from-bottom-4 duration-700">
+        <div className="flex flex-col md:flex-row gap-8 items-start max-w-6xl w-full p-6 animate-in fade-in slide-in-from-bottom-4 duration-700">
           {/* Main Menu */}
           <div className="text-center space-y-8 p-10 bg-secondary rounded-3xl shadow-2xl border border-white/10 flex-1 w-full">
             <div className="space-y-2">
