@@ -23,18 +23,21 @@ const CountdownOverlay: React.FC<{ onComplete: () => void }> = ({ onComplete }) 
   const [count, setCount] = useState(3);
 
   useEffect(() => {
-    if (count === 0) {
-      onComplete();
-      return;
-    }
-    const timer = setTimeout(() => setCount(count - 1), 1000);
+    if (count <= 0) return;
+    const timer = setTimeout(() => {
+      if (count === 1) {
+        onComplete();
+      } else {
+        setCount(count - 1);
+      }
+    }, 1000);
     return () => clearTimeout(timer);
   }, [count, onComplete]);
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-background/80 backdrop-blur-sm">
-      <div className="text-[12rem] font-black text-primary animate-ping">
-        {count > 0 ? count : 'GO!'}
+      <div key={count} className="text-[12rem] font-black text-primary animate-in zoom-in-50 fade-in duration-500">
+        {count}
       </div>
     </div>
   );

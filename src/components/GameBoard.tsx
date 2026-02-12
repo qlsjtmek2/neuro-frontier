@@ -97,22 +97,22 @@ export const GameBoard: React.FC = () => {
       )}
 
       {/* Game HUD */}
-      <div className="absolute top-4 left-4 right-4 flex justify-between items-start pointer-events-none">
-        <div className="space-y-1">
+      <div className="absolute top-4 left-4 right-4 flex items-start pointer-events-none">
+        <div className="flex-1 space-y-1">
           <div className="text-slate-500 text-xs font-bold uppercase tracking-widest">Score</div>
-          <div className="text-4xl font-black text-primary">{score}</div>
+          <div className="text-4xl font-black text-primary tabular-nums">{score}</div>
         </div>
-        
-        <div className="text-center">
+
+        <div className="flex-1 text-center">
           <div className="text-slate-500 text-xs font-bold uppercase tracking-widest">Time</div>
-          <div className={`text-4xl font-black ${timeLeft <= 10 ? 'text-error animate-pulse' : 'text-white'}`}>
+          <div className={`text-4xl font-black tabular-nums ${timeLeft <= 10 ? 'text-error animate-pulse' : 'text-white'}`}>
             {timeLeft}s
           </div>
         </div>
 
-        <div className="text-right space-y-1">
+        <div className="flex-1 text-right space-y-1">
           <div className="text-slate-500 text-xs font-bold uppercase tracking-widest">Hits</div>
-          <div className="text-4xl font-black text-success">{hits}</div>
+          <div className="text-4xl font-black text-success tabular-nums">{hits}</div>
         </div>
       </div>
 
