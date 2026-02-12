@@ -154,10 +154,11 @@ export const useGameStore = create<GameStore>()(
 
       addMiss: () => {
         if (get().status !== 'PLAYING') return;
-        const { score, misses } = get();
+        const { score, misses, responseTimes } = get();
         set({
-          score: Math.max(0, score - 50),
+          score: Math.max(0, score - 300), // Increased penalty from 50 to 300
           misses: misses + 1,
+          responseTimes: [...responseTimes, 1500], // Penalize RT by adding 1.5s
         });
         get().adjustDifficulty(false);
       },
