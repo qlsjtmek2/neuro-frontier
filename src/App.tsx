@@ -44,14 +44,25 @@ const CountdownOverlay: React.FC<{ onComplete: () => void }> = ({ onComplete }) 
 };
 
 const App: React.FC = () => {
-  const { status, startCountdown, startGame, score, session, resetGame } = useGameStore();
+  const { status, startCountdown, startGame, score, session, resetGame, history } = useGameStore();
+  const [isHydrated, setIsHydrated] = useState(false);
+
+  useEffect(() => {
+    setIsHydrated(true);
+  }, []);
+
+  const bestScore = history && history.length > 0 
+    ? Math.max(...history.map(s => s.score)) 
+    : 0;
+
+  if (!isHydrated) return <div className="min-h-screen bg-background" />;
 
   return (
-    <div className="min-h-screen bg-background text-foreground flex flex-col items-center justify-center">
+    <div className="min-h-screen bg-background text-foreground flex flex-col items-center justify-center font-sans">
       {status === 'IDLE' && (
-        <div className="flex flex-col md:flex-row gap-8 items-start max-w-6xl w-full p-6 animate-in fade-in slide-in-from-bottom-4 duration-700">
+        <div className="flex flex-col md:flex-row gap-8 items-stretch max-w-6xl w-full p-6 animate-in fade-in slide-in-from-bottom-4 duration-700">
           {/* Main Menu */}
-          <div className="text-center space-y-8 p-10 bg-secondary rounded-3xl shadow-2xl border border-white/10 flex-1 w-full md:sticky md:top-6">
+          <div className="text-center space-y-8 p-10 bg-secondary rounded-3xl shadow-2xl border border-white/10 flex-1 w-full">
             <div className="space-y-2">
               <h1 className="text-5xl font-black tracking-tighter text-primary">
                 NEURO <br />
@@ -60,28 +71,46 @@ const App: React.FC = () => {
               <div className="h-1 w-20 bg-primary mx-auto rounded-full" />
             </div>
             
-            <p className="text-slate-400 text-lg leading-relaxed">
-              인지-운동 이중 과업을 통한 <br />
-              <span className="text-white font-medium">에이징 커브 극복</span> 트레이닝
-            </p>
-
-            <button
-              onClick={startCountdown}
-              className="w-full py-5 bg-primary hover:bg-blue-600 text-white rounded-2xl font-bold text-2xl transition-all active:scale-95 shadow-xl shadow-blue-500/25 group"
-            >
-              트레이닝 시작
-              <span className="block text-xs font-normal text-blue-200 mt-1 opacity-60 group-hover:opacity-100 uppercase tracking-widest">Start Session</span>
-            </button>
-
-            <div className="grid grid-cols-2 gap-4 text-left">
-              <div className="p-4 bg-background/50 rounded-xl border border-white/5">
-                <div className="text-slate-500 text-[10px] font-bold uppercase mb-1">Motor</div>
-                <div className="text-xs text-slate-300">Mouse Agility</div>
+            {/* Best Score Badge */}
+            {bestScore > 0 && (
+              <div className="inline-block px-6 py-3 bg-primary/10 rounded-2xl border border-primary/20">
+                <span className="text-xs font-bold text-primary uppercase tracking-widest block mb-1">Personal Best</span>
+                <div className="text-3xl font-black text-white">{bestScore}</div>
               </div>
-              <div className="p-4 bg-background/50 rounded-xl border border-white/5">
-                <div className="text-slate-500 text-[10px] font-bold uppercase mb-1">Cognitive</div>
-                <div className="text-xs text-slate-300">Dual-Task Parity</div>
+            )}
+
+            <div className="space-y-6">
+              <div className="text-left space-y-4 bg-background/40 p-6 rounded-2xl border border-white/5">
+                <h3 className="text-xs font-bold text-slate-500 uppercase tracking-widest border-b border-white/5 pb-2">How to Play</h3>
+                <div className="space-y-4">
+                  <div className="flex items-center gap-4">
+                    <div className="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center border border-primary/30 shrink-0">
+                      <span className="text-primary font-bold text-xs">1</span>
+                    </div>
+                    <p className="text-sm text-slate-300"><span className="text-primary font-bold">파란색 타겟</span>을 마우스로 빠르게 클릭하세요.</p>
+                  </div>
+                  <div className="flex items-center gap-4">
+                    <div className="w-8 h-8 rounded-full bg-accent/20 flex items-center justify-center border border-accent/30 shrink-0">
+                      <span className="text-accent font-bold text-xs">2</span>
+                    </div>
+                    <p className="text-sm text-slate-300">중앙의 숫자가 <span className="text-white font-bold">홀수면 [A]</span>, <span className="text-white font-bold">짝수면 [D]</span> 키를 누르세요.</p>
+                  </div>
+                  <div className="flex items-center gap-4">
+                    <div className="w-8 h-8 rounded-full bg-error/20 flex items-center justify-center border border-error/30 shrink-0">
+                      <span className="text-error font-bold text-xs">!</span>
+                    </div>
+                    <p className="text-sm text-slate-300"><span className="text-error font-bold">빨간색 타겟</span>을 클릭하면 점수가 깎이니 주의하세요!</p>
+                  </div>
+                </div>
               </div>
+
+              <button
+                onClick={startCountdown}
+                className="w-full py-5 bg-primary hover:bg-blue-600 text-white rounded-2xl font-bold text-2xl transition-all active:scale-95 shadow-xl shadow-blue-500/25 group"
+              >
+                트레이닝 시작
+                <span className="block text-xs font-normal text-blue-200 mt-1 opacity-60 group-hover:opacity-100 uppercase tracking-widest">Start Session</span>
+              </button>
             </div>
           </div>
 
