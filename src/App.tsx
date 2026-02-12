@@ -128,17 +128,23 @@ const App: React.FC = () => {
                     <div className="w-6 h-6 rounded-full border border-white/30 flex items-center justify-center shrink-0">
                       <span className="text-white font-bold text-[10px]">1</span>
                     </div>
-                    <p className="text-sm text-slate-300"><span className="text-blue-500 font-bold">파란색 타겟</span>을 마우스로 빠르게 클릭하세요.</p>
+                    <p className="text-sm text-slate-300">정확한 측정을 위해 <span className="text-white font-bold">화면을 크게 키워주세요.</span></p>
                   </div>
                   <div className="flex items-center gap-4">
                     <div className="w-6 h-6 rounded-full border border-white/30 flex items-center justify-center shrink-0">
                       <span className="text-white font-bold text-[10px]">2</span>
                     </div>
-                    <p className="text-sm text-slate-300">중앙의 숫자가 <span className="text-white font-bold">홀수면 [A]</span>, <span className="text-white font-bold">짝수면 [D]</span> 키를 누르세요.</p>
+                    <p className="text-sm text-slate-300"><span className="text-blue-500 font-bold">파란색 타겟</span>을 마우스로 빠르게 클릭하세요.</p>
                   </div>
                   <div className="flex items-center gap-4">
                     <div className="w-6 h-6 rounded-full border border-white/30 flex items-center justify-center shrink-0">
                       <span className="text-white font-bold text-[10px]">3</span>
+                    </div>
+                    <p className="text-sm text-slate-300">중앙의 숫자가 <span className="text-white font-bold">홀수면 [A]</span>, <span className="text-white font-bold">짝수면 [D]</span> 키를 누르세요.</p>
+                  </div>
+                  <div className="flex items-center gap-4">
+                    <div className="w-6 h-6 rounded-full border border-white/30 flex items-center justify-center shrink-0">
+                      <span className="text-white font-bold text-[10px]">4</span>
                     </div>
                     <p className="text-sm text-slate-300"><span className="text-error font-bold">빨간색 타겟</span>을 클릭하면 점수가 깎이니 주의하세요!</p>
                   </div>
