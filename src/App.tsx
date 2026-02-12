@@ -167,9 +167,14 @@ const App: React.FC = () => {
                 <span className="text-[10px] font-bold text-blue-500 uppercase tracking-widest">Top 10</span>
               </div>
               <div className="space-y-2">
-                {leaderboard.length === 0 ? (
-                  <div className="p-4 text-center bg-secondary/30 rounded-xl border border-dashed border-white/5 text-slate-500 text-xs">
+                {useGameStore.getState().isLeaderboardLoading ? (
+                  <div className="p-4 text-center bg-secondary/30 rounded-xl border border-dashed border-white/5 text-slate-500 text-xs flex items-center justify-center gap-2">
+                    <div className="w-1 h-1 bg-blue-500 rounded-full animate-bounce" />
                     데이터를 불러오는 중...
+                  </div>
+                ) : leaderboard.length === 0 ? (
+                  <div className="p-8 text-center bg-secondary/30 rounded-xl border border-dashed border-white/5">
+                    <p className="text-slate-500 text-sm italic">아직 등록된 기록이 없습니다.</p>
                   </div>
                 ) : (
                   leaderboard.map((entry, i) => (

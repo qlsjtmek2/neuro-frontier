@@ -27,6 +27,7 @@ interface GameStore {
   currentTaskCreatedAt: number; // Task RT 측정을 위한 타임스탬프
   nickname: string;
   leaderboard: LeaderboardEntry[];
+  isLeaderboardLoading: boolean;
 
   // Actions
   startCountdown: () => void;
@@ -80,6 +81,7 @@ export const useGameStore = create<GameStore>()(
       currentTaskCreatedAt: 0,
       nickname: '',
       leaderboard: [],
+      isLeaderboardLoading: true,
 
       startCountdown: () => {
         set({ status: 'COUNTDOWN' });
@@ -252,6 +254,7 @@ export const useGameStore = create<GameStore>()(
       },
 
       fetchLeaderboard: async () => {
+        set({ isLeaderboardLoading: true });
         const { data, error } = await supabase
           .from('leaderboard')
           .select('*')
@@ -261,6 +264,7 @@ export const useGameStore = create<GameStore>()(
         if (!error && data) {
           set({ leaderboard: data });
         }
+        set({ isLeaderboardLoading: false });
       },
     }),
     {
