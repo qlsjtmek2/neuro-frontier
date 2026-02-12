@@ -105,7 +105,7 @@ export const GameBoard: React.FC = () => {
 
         <div className="flex-1 text-center">
           <div className="text-slate-500 text-xs font-bold uppercase tracking-widest">Time</div>
-          <div className={`text-4xl font-black tabular-nums ${timeLeft <= 10 ? 'text-error animate-pulse' : 'text-white'}`}>
+          <div className={`text-4xl font-black tabular-nums ${timeLeft <= 10 ? 'text-error' : 'text-white'}`}>
             {timeLeft}s
           </div>
         </div>
