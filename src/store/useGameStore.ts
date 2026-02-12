@@ -24,6 +24,7 @@ interface GameStore {
   history: GameSession[];
   settings: GameSettings;
   currentTask: CognitiveTask | null;
+  currentTaskCreatedAt: number; // Task RT 측정을 위한 타임스탬프
   nickname: string;
   leaderboard: LeaderboardEntry[];
 
@@ -76,6 +77,7 @@ export const useGameStore = create<GameStore>()(
       history: [],
       settings: DEFAULT_SETTINGS,
       currentTask: null,
+      currentTaskCreatedAt: 0,
       nickname: '',
       leaderboard: [],
 
@@ -84,6 +86,7 @@ export const useGameStore = create<GameStore>()(
       },
 
       startGame: () => {
+        const firstTask = generateTask();
         set({
           status: 'PLAYING',
           score: 0,
@@ -93,7 +96,8 @@ export const useGameStore = create<GameStore>()(
           cognitiveMisses: 0,
           responseTimes: [],
           settings: { ...DEFAULT_SETTINGS },
-          currentTask: generateTask(),
+          currentTask: firstTask,
+          currentTaskCreatedAt: performance.now(),
           session: {
             id: Date.now().toString(),
             startTime: Date.now(),
@@ -111,9 +115,11 @@ export const useGameStore = create<GameStore>()(
 
       endGame: () => {
         const { score, hits, misses, cognitiveHits, cognitiveMisses, responseTimes, session, history } = get();
+        
+        // 반응 기록이 전혀 없는 경우 페널티 RT 적용 (2000ms)
         const avgRT = responseTimes.length > 0 
           ? responseTimes.reduce((a, b) => a + b, 0) / responseTimes.length 
-          : 0;
+          : 2000;
 
         const updatedSession: GameSession = {
           ...(session as GameSession),
@@ -158,24 +164,33 @@ export const useGameStore = create<GameStore>()(
 
       addCognitiveHit: () => {
         if (get().status !== 'PLAYING') return;
+        const rt = performance.now() - get().currentTaskCreatedAt;
         set((state) => ({
           score: state.score + 200,
           cognitiveHits: state.cognitiveHits + 1,
+          responseTimes: [...state.responseTimes, rt],
           currentTask: generateTask(),
+          currentTaskCreatedAt: performance.now(),
         }));
       },
 
       addCognitiveMiss: () => {
         if (get().status !== 'PLAYING') return;
+        const rt = performance.now() - get().currentTaskCreatedAt;
         set((state) => ({
           score: Math.max(0, state.score - 500),
           cognitiveMisses: state.cognitiveMisses + 1,
+          responseTimes: [...state.responseTimes, rt],
           currentTask: generateTask(),
+          currentTaskCreatedAt: performance.now(),
         }));
       },
 
       setNewTask: () => {
-        set({ currentTask: generateTask() });
+        set({ 
+          currentTask: generateTask(),
+          currentTaskCreatedAt: performance.now()
+        });
       },
 
       adjustDifficulty: (success: boolean) => {
