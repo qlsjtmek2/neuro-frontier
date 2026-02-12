@@ -13,9 +13,10 @@ function normalCDF(x: number): number {
   return 0.5 * (1.0 + sign * y);
 }
 
-// Dual-task visual RT 기준: mean ~450ms, SD ~120ms
+// Dual-task visual RT 기준 완화: 이중 과업 부하 고려
+// mean ~650ms, SD ~150ms (500ms 이하면 초엘리트 수준)
 function getResponseTimePercentile(avgRT: number): number {
-  const z = (avgRT - 450) / 120;
+  const z = (avgRT - 650) / 150;
   return Math.max(1, Math.min(99, Math.round(normalCDF(z) * 100)));
 }
 
@@ -43,6 +44,15 @@ const CountdownOverlay: React.FC<{ onComplete: () => void }> = ({ onComplete }) 
   );
 };
 
+const getPerformanceRank = (rt: number) => {
+  const p = getResponseTimePercentile(rt);
+  if (p <= 5) return { label: '신경계 마스터', color: 'text-primary', percentile: `상위 ${p}%` };
+  if (p <= 15) return { label: '프로 운동선수', color: 'text-success', percentile: `상위 ${p}%` };
+  if (p <= 35) return { label: '우수한 집중력', color: 'text-accent', percentile: `상위 ${p}%` };
+  if (p <= 65) return { label: '평균 수준', color: 'text-white', percentile: `상위 ${p}%` };
+  return { label: '훈련 필요', color: 'text-slate-500', percentile: `상위 ${p}%` };
+};
+
 const App: React.FC = () => {
   const { status, startCountdown, startGame, score, session, resetGame, history } = useGameStore();
   const [isHydrated, setIsHydrated] = useState(false);
@@ -54,6 +64,8 @@ const App: React.FC = () => {
   const bestScore = history && history.length > 0 
     ? Math.max(...history.map(s => s.score)) 
     : 0;
+
+  const rank = session ? getPerformanceRank(session.averageResponseTime) : null;
 
   if (!isHydrated) return <div className="min-h-screen bg-background" />;
 
@@ -156,32 +168,32 @@ const App: React.FC = () => {
 
       {status === 'PLAYING' && <GameBoard />}
 
-      {status === 'RESULT' && session && (
-        <div className="text-center space-y-6 p-10 bg-secondary rounded-2xl shadow-2xl border border-white/10 max-w-2xl w-full mx-4">
+      {status === 'RESULT' && session && rank && (
+        <div className="text-center space-y-6 p-10 bg-secondary rounded-2xl shadow-2xl border border-white/10 max-w-2xl w-full mx-4 animate-in zoom-in duration-500">
           <div className="space-y-2">
             <h2 className="text-4xl font-black text-white">훈련 요약</h2>
             <p className="text-slate-400">데이터 기반 인지-운동 퍼포먼스 분석</p>
           </div>
           
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 py-4">
-            {/* Primary Metrics */}
-            <div className="col-span-1 md:col-span-2 p-6 bg-primary/10 rounded-2xl border border-primary/20 flex justify-between items-center">
-              <div className="text-left">
-                <div className="text-primary text-sm font-bold uppercase tracking-widest">Final Score</div>
-                <div className="text-5xl font-black text-primary">{score}</div>
-              </div>
-              <div className="text-right">
-                <div className="text-slate-500 text-sm font-bold uppercase tracking-widest">Response Time</div>
-                <div className="text-4xl font-black text-accent">{Math.round(session.averageResponseTime)}ms</div>
-                {session.averageResponseTime > 0 && (
-                  <div className="text-sm font-bold mt-1">
-                    <span className="text-slate-500">상위 </span>
-                    <span className={`${getResponseTimePercentile(session.averageResponseTime) <= 30 ? 'text-success' : getResponseTimePercentile(session.averageResponseTime) <= 60 ? 'text-accent' : 'text-error'}`}>
-                      {getResponseTimePercentile(session.averageResponseTime)}%
-                    </span>
-                  </div>
-                )}
-              </div>
+            {/* Primary Metrics: Rank & Percentile */}
+            <div className="col-span-1 md:col-span-2 p-8 bg-primary/5 rounded-2xl border border-primary/20 flex flex-col items-center justify-center space-y-2 relative overflow-hidden group">
+              <div className="absolute inset-0 bg-primary/5 translate-y-full group-hover:translate-y-0 transition-transform duration-500" />
+              <div className="relative z-10 text-slate-500 text-xs font-bold uppercase tracking-[0.3em]">Performance Tier</div>
+              <div className={`relative z-10 text-5xl font-black ${rank.color} drop-shadow-[0_0_15px_rgba(59,130,246,0.3)]`}>{rank.label}</div>
+              <div className="relative z-10 text-white/60 font-bold text-lg">{rank.percentile} 수준</div>
+            </div>
+
+            {/* Final Score */}
+            <div className="p-6 bg-background/50 rounded-xl border border-white/5 flex flex-col justify-center">
+              <div className="text-slate-500 text-[10px] font-bold uppercase tracking-widest mb-1">Final Score</div>
+              <div className="text-4xl font-black text-primary">{score}</div>
+            </div>
+
+            {/* Response Time */}
+            <div className="p-6 bg-background/50 rounded-xl border border-white/5 flex flex-col justify-center">
+              <div className="text-slate-500 text-[10px] font-bold uppercase tracking-widest mb-1">Avg Response</div>
+              <div className="text-4xl font-black text-accent">{Math.round(session.averageResponseTime)}ms</div>
             </div>
 
             {/* Motor Performance */}
