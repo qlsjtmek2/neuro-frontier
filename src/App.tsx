@@ -64,16 +64,16 @@ const App: React.FC = () => {
           {/* Main Menu */}
           <div className="text-center space-y-8 p-10 bg-secondary rounded-3xl shadow-2xl border border-white/10 flex-1 w-full">
             <div className="space-y-2">
-              <h1 className="text-5xl font-black tracking-tighter text-primary">
-                NEURO <br />
+              <h1 className="text-5xl font-black tracking-tighter">
+                <span className="text-primary">NEURO</span> <br />
                 <span className="text-white">FRONTIER</span>
               </h1>
-              <div className="h-1 w-20 bg-primary mx-auto rounded-full" />
+              <div className="h-1.5 w-24 bg-primary mx-auto rounded-full shadow-[0_0_15px_rgba(59,130,246,0.5)]" />
             </div>
             
             {/* Best Score Badge */}
             {bestScore > 0 && (
-              <div className="inline-block px-6 py-3 bg-primary/10 rounded-2xl border border-primary/20">
+              <div className="inline-block px-6 py-3 bg-primary/10 rounded-2xl border border-primary/30">
                 <span className="text-xs font-bold text-primary uppercase tracking-widest block mb-1">Personal Best</span>
                 <div className="text-3xl font-black text-white">{bestScore}</div>
               </div>
@@ -106,10 +106,10 @@ const App: React.FC = () => {
 
               <button
                 onClick={startCountdown}
-                className="w-full py-5 bg-primary hover:bg-blue-600 text-white rounded-2xl font-bold text-2xl transition-all active:scale-95 shadow-xl shadow-blue-500/25 group"
+                className="w-full py-5 bg-primary hover:bg-blue-400 text-white rounded-2xl font-black text-2xl transition-all active:scale-[0.98] shadow-[0_0_25px_rgba(59,130,246,0.4)] border-2 border-blue-400/50 group"
               >
                 트레이닝 시작
-                <span className="block text-xs font-normal text-blue-200 mt-1 opacity-60 group-hover:opacity-100 uppercase tracking-widest">Start Session</span>
+                <span className="block text-xs font-bold text-blue-100 mt-1 opacity-70 group-hover:opacity-100 uppercase tracking-[0.2em]">Start Training</span>
               </button>
             </div>
           </div>
