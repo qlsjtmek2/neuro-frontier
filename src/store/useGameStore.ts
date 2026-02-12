@@ -151,7 +151,7 @@ export const useGameStore = create<GameStore>()(
       addCognitiveMiss: () => {
         if (get().status !== 'PLAYING') return;
         set((state) => ({
-          score: Math.max(0, state.score - 100),
+          score: Math.max(0, state.score - 500),
           cognitiveMisses: state.cognitiveMisses + 1,
           currentTask: generateTask(),
         }));
