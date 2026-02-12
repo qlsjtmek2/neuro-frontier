@@ -12,6 +12,7 @@
 ## 🛠 기술 스택
 - **Framework**: React 19 (Vite 8)
 - **Language**: TypeScript
+- **Backend**: Supabase (Database, Global Leaderboard)
 - **State Management**: Zustand (with Persist middleware)
 - **Styling**: Tailwind CSS v4
 - **Rendering**: Canvas API (requestAnimationFrame 기반 60FPS 게임 루프)
@@ -20,6 +21,11 @@
 - **UI Layer (React)**: 메뉴, 카운트다운, 결과 대시보드, 세션 통계 UI 담당.
 - **Game Layer (Canvas + Vanilla TS)**: `src/engines/GameEngine.ts`. 타겟 렌더링, 정밀 입력 판정, 시각적 피드백(Ripple) 담당.
 - **State Layer (Zustand)**: `src/store/useGameStore.ts`. 전역 게임 상태, 세션 기록, 난이도 매개변수 관리.
+- **Backend Layer (Supabase)**: 글로벌 랭킹 데이터 저장 및 실시간 조회.
+
+## 🔑 환경 변수 (.env)
+- `VITE_SUPABASE_URL`: Supabase 프로젝트 URL
+- `VITE_SUPABASE_ANON_KEY`: Supabase Anonymous API Key
 
 ## 🚀 주요 명령어
 - `npm run dev`: 개발 서버 실행 (http://localhost:5173)

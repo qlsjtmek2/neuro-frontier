@@ -1,6 +1,16 @@
 import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
 import type { GameStatus, GameSession, GameSettings, CognitiveTask } from '../types';
+import { supabase } from '../lib/supabase';
+
+export interface LeaderboardEntry {
+  id: string;
+  nickname: string;
+  score: number;
+  avg_rt: number;
+  accuracy: number;
+  created_at: string;
+}
 
 interface GameStore {
   status: GameStatus;
@@ -14,6 +24,8 @@ interface GameStore {
   history: GameSession[];
   settings: GameSettings;
   currentTask: CognitiveTask | null;
+  nickname: string;
+  leaderboard: LeaderboardEntry[];
 
   // Actions
   startCountdown: () => void;
@@ -27,6 +39,9 @@ interface GameStore {
   resetGame: () => void;
   adjustDifficulty: (success: boolean) => void;
   clearHistory: () => void;
+  setNickname: (name: string) => void;
+  submitScore: () => Promise<{ success: boolean; error?: any }>;
+  fetchLeaderboard: () => Promise<void>;
 }
 
 const DEFAULT_SETTINGS: GameSettings = {
@@ -61,6 +76,8 @@ export const useGameStore = create<GameStore>()(
       history: [],
       settings: DEFAULT_SETTINGS,
       currentTask: null,
+      nickname: '',
+      leaderboard: [],
 
       startCountdown: () => {
         set({ status: 'COUNTDOWN' });
@@ -192,11 +209,48 @@ export const useGameStore = create<GameStore>()(
       clearHistory: () => {
         set({ history: [] });
       },
+
+      setNickname: (name: string) => {
+        set({ nickname: name });
+      },
+
+      submitScore: async () => {
+        const { score, session, nickname } = get();
+        if (!session || !nickname) return { success: false, error: 'No session or nickname' };
+
+        const { error } = await supabase
+          .from('leaderboard')
+          .insert([
+            {
+              nickname,
+              score,
+              avg_rt: Math.round(session.averageResponseTime),
+              accuracy: session.totalTargets > 0 ? Math.round((session.hits / session.totalTargets) * 100) : 0,
+            }
+          ]);
+
+        if (error) return { success: false, error };
+        
+        await get().fetchLeaderboard();
+        return { success: true };
+      },
+
+      fetchLeaderboard: async () => {
+        const { data, error } = await supabase
+          .from('leaderboard')
+          .select('*')
+          .order('score', { ascending: false })
+          .limit(10);
+
+        if (!error && data) {
+          set({ leaderboard: data });
+        }
+      },
     }),
     {
       name: 'neuro-physical-storage',
       storage: createJSONStorage(() => localStorage),
-      partialize: (state) => ({ history: state.history }), // Only persist history
+      partialize: (state) => ({ history: state.history, nickname: state.nickname }), // Persist history and nickname
     }
   )
 );

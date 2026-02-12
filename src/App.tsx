@@ -55,18 +55,46 @@ const getPerformanceRank = (rt: number) => {
 };
 
 const App: React.FC = () => {
-  const { status, startCountdown, startGame, score, session, resetGame, history } = useGameStore();
+  const { 
+    status, startCountdown, startGame, score, session, resetGame, history, 
+    nickname, setNickname, submitScore, fetchLeaderboard, leaderboard 
+  } = useGameStore();
   const [isHydrated, setIsHydrated] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [hasSubmitted, setHasSubmitted] = useState(false);
 
   useEffect(() => {
     setIsHydrated(true);
-  }, []);
+    fetchLeaderboard();
+  }, [fetchLeaderboard]);
 
   const bestScore = history && history.length > 0 
     ? Math.max(...history.map(s => s.score)) 
     : 0;
 
   const rank = session ? getPerformanceRank(session.averageResponseTime) : null;
+
+  const handleStartCountdown = () => {
+    setHasSubmitted(false);
+    startCountdown();
+  };
+
+  const handleSubmitScore = async () => {
+    if (!nickname.trim()) {
+      alert('닉네임을 입력해주세요!');
+      return;
+    }
+    setIsSubmitting(true);
+    const { success, error } = await submitScore();
+    setIsSubmitting(false);
+    if (success) {
+      setHasSubmitted(true);
+      alert('기록이 등록되었습니다!');
+    } else {
+      console.error(error);
+      alert('등록 중 오류가 발생했습니다.');
+    }
+  };
 
   if (!isHydrated) return <div className="min-h-screen bg-background" />;
 
@@ -118,7 +146,7 @@ const App: React.FC = () => {
               </div>
 
               <button
-                onClick={startCountdown}
+                onClick={handleStartCountdown}
                 className="w-full py-5 bg-primary hover:bg-blue-400 text-white rounded-2xl font-black text-2xl transition-all active:scale-[0.98] shadow-[0_0_25px_rgba(59,130,246,0.4)] border-2 border-blue-400/50 group"
               >
                 트레이닝 시작
@@ -130,39 +158,70 @@ const App: React.FC = () => {
             </div>
           </div>
 
-          {/* History Sidebar */}
-          <div className="w-full md:w-80 space-y-4">
-            <div className="flex justify-between items-end px-2">
-              <h3 className="text-xl font-bold text-white">최근 기록</h3>
-              <button 
-                onClick={() => { if(confirm('기록을 모두 삭제하시겠습니까?')) useGameStore.getState().clearHistory(); }}
-                className="text-[10px] font-bold text-slate-500 hover:text-error transition-colors uppercase tracking-widest"
-              >
-                Clear All
-              </button>
-            </div>
-            
-            <div className="space-y-3 max-h-[500px] overflow-y-auto pr-2 custom-scrollbar">
-              {useGameStore.getState().history.length === 0 ? (
-                <div className="p-8 text-center bg-secondary/30 rounded-2xl border border-dashed border-white/10">
-                  <p className="text-slate-500 text-sm italic">아직 기록이 없습니다.</p>
-                </div>
-              ) : (
-                useGameStore.getState().history.map((s) => (
-                  <div key={s.id} className="p-4 bg-secondary/50 rounded-xl border border-white/5 hover:border-primary/30 transition-all group">
-                    <div className="flex justify-between items-start mb-2">
-                      <div className="text-xs text-slate-500 font-medium">
-                        {new Date(s.startTime).toLocaleDateString()} {new Date(s.startTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                      </div>
-                      <div className="text-primary font-black text-lg group-hover:scale-110 transition-transform">{s.score}</div>
-                    </div>
-                    <div className="flex justify-between text-[10px] font-bold uppercase tracking-widest">
-                      <div className="text-slate-400">RT: <span className="text-accent">{Math.round(s.averageResponseTime)}ms</span></div>
-                      <div className="text-slate-400">ACC: <span className="text-success">{s.totalTargets > 0 ? Math.round((s.hits / s.totalTargets) * 100) : 0}%</span></div>
-                    </div>
+          {/* Sidebar: Leaderboard & History */}
+          <div className="w-full md:w-80 space-y-8">
+            {/* Global Leaderboard */}
+            <div className="space-y-4">
+              <div className="flex justify-between items-end px-2">
+                <h3 className="text-xl font-bold text-white">글로벌 랭킹</h3>
+                <span className="text-[10px] font-bold text-blue-500 uppercase tracking-widest">Top 10</span>
+              </div>
+              <div className="space-y-2">
+                {leaderboard.length === 0 ? (
+                  <div className="p-4 text-center bg-secondary/30 rounded-xl border border-dashed border-white/5 text-slate-500 text-xs">
+                    데이터를 불러오는 중...
                   </div>
-                ))
-              )}
+                ) : (
+                  leaderboard.map((entry, i) => (
+                    <div key={entry.id} className="flex items-center gap-3 p-3 bg-secondary/50 rounded-xl border border-white/5">
+                      <div className={`w-6 h-6 rounded flex items-center justify-center text-xs font-black ${i === 0 ? 'bg-accent text-background' : i === 1 ? 'bg-slate-300 text-background' : i === 2 ? 'bg-orange-400 text-background' : 'text-slate-500'}`}>
+                        {i + 1}
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <div className="text-sm font-bold text-white truncate">{entry.nickname}</div>
+                        <div className="text-[10px] text-slate-500 uppercase">{entry.avg_rt}ms | {entry.accuracy}%</div>
+                      </div>
+                      <div className="text-primary font-black">{entry.score}</div>
+                    </div>
+                  ))
+                )}
+              </div>
+            </div>
+
+            {/* History Sidebar */}
+            <div className="space-y-4">
+              <div className="flex justify-between items-end px-2">
+                <h3 className="text-xl font-bold text-white">최근 기록</h3>
+                <button 
+                  onClick={() => { if(confirm('기록을 모두 삭제하시겠습니까?')) useGameStore.getState().clearHistory(); }}
+                  className="text-[10px] font-bold text-slate-500 hover:text-error transition-colors uppercase tracking-widest"
+                >
+                  Clear All
+                </button>
+              </div>
+              
+              <div className="space-y-3 max-h-[300px] overflow-y-auto pr-2 custom-scrollbar">
+                {history.length === 0 ? (
+                  <div className="p-8 text-center bg-secondary/30 rounded-2xl border border-dashed border-white/10">
+                    <p className="text-slate-500 text-sm italic">아직 기록이 없습니다.</p>
+                  </div>
+                ) : (
+                  history.map((s) => (
+                    <div key={s.id} className="p-4 bg-secondary/50 rounded-xl border border-white/5 hover:border-primary/30 transition-all group">
+                      <div className="flex justify-between items-start mb-2">
+                        <div className="text-xs text-slate-500 font-medium">
+                          {new Date(s.startTime).toLocaleDateString()}
+                        </div>
+                        <div className="text-primary font-black text-lg group-hover:scale-110 transition-transform">{s.score}</div>
+                      </div>
+                      <div className="flex justify-between text-[10px] font-bold uppercase tracking-widest">
+                        <div className="text-slate-400">RT: <span className="text-accent">{Math.round(s.averageResponseTime)}ms</span></div>
+                        <div className="text-slate-400">ACC: <span className="text-success">{s.totalTargets > 0 ? Math.round((s.hits / s.totalTargets) * 100) : 0}%</span></div>
+                      </div>
+                    </div>
+                  ))
+                )}
+              </div>
             </div>
           </div>
         </div>
@@ -198,6 +257,35 @@ const App: React.FC = () => {
             <div className="p-6 bg-background/50 rounded-xl border border-white/5 flex flex-col justify-center">
               <div className="text-slate-500 text-[10px] font-bold uppercase tracking-widest mb-1">Avg Response</div>
               <div className="text-4xl font-black text-accent">{Math.round(session.averageResponseTime)}ms</div>
+            </div>
+
+            {/* Leaderboard Submission */}
+            <div className="col-span-1 md:col-span-2 p-6 bg-secondary/50 rounded-2xl border border-white/5 space-y-4">
+              <div className="text-slate-500 text-[10px] font-bold uppercase tracking-widest text-center">Global Leaderboard</div>
+              {!hasSubmitted ? (
+                <div className="flex gap-2">
+                  <input
+                    type="text"
+                    placeholder="닉네임 입력"
+                    value={nickname}
+                    onChange={(e) => setNickname(e.target.value)}
+                    maxLength={12}
+                    className="flex-1 bg-background border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-primary transition-colors"
+                  />
+                  <button
+                    onClick={handleSubmitScore}
+                    disabled={isSubmitting}
+                    className="bg-primary hover:bg-blue-600 disabled:opacity-50 text-white font-bold px-6 py-3 rounded-xl transition-all active:scale-95 whitespace-nowrap"
+                  >
+                    {isSubmitting ? '등록 중...' : '기록 등록'}
+                  </button>
+                </div>
+              ) : (
+                <div className="py-3 text-success font-bold flex items-center justify-center gap-2">
+                  <div className="w-2 h-2 bg-success rounded-full animate-pulse" />
+                  글로벌 랭킹에 등록되었습니다!
+                </div>
+              )}
             </div>
 
             {/* Motor Performance */}
