@@ -28,7 +28,8 @@ export const AdSense: React.FC<AdSenseProps> = ({
   }, []);
 
   return (
-    <div className="ad-container my-8 overflow-hidden flex justify-center">
+    <div className="ad-container my-8 overflow-hidden flex flex-col items-center gap-2">
+      <span className="text-[10px] text-slate-700 font-bold tracking-widest uppercase">Advertisement</span>
       {/* 실제 애드센스 코드 (승인 후 활성화) */}
       <ins
         className="adsbygoogle"
